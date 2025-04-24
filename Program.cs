@@ -17,6 +17,7 @@ do
   Console.WriteLine("3) Display Category and related products");
   Console.WriteLine("4) Display all Categories and their related products");
   Console.WriteLine("5) Add product");
+  Console.WriteLine("6) Edit product");
   Console.WriteLine("Enter to quit");
   string? choice = Console.ReadLine();
   Console.Clear();
@@ -192,6 +193,96 @@ do
       catch (Exception ex)
       {
         logger.Error($"Error adding product: {ex.Message}");
+      }
+    }
+    else
+    {
+      foreach (var result in results)
+      {
+        logger.Error($"{result.MemberNames.FirstOrDefault() ?? ""} : {result.ErrorMessage}");
+      }
+    }
+  }
+  else if (choice == "6")
+  {
+    var db = new DataContext();
+    var products = db.Products.OrderBy(p => p.ProductId).ToList();
+    Console.WriteLine("Select the Product to edit:");
+    foreach (var p in products)
+    {
+      Console.WriteLine($"{p.ProductId}) {p.ProductName}");
+    }
+    if (!int.TryParse(Console.ReadLine(), out int productId) || !products.Any(p => p.ProductId == productId))
+    {
+      logger.Error("Invalid product selection");
+      return;
+    }
+    var product = db.Products.First(p => p.ProductId == productId);
+    Console.WriteLine($"Editing Product: {product.ProductName}");
+
+    Console.WriteLine($"Enter Product Name ({product.ProductName}):");
+    string? input = Console.ReadLine();
+    if (!string.IsNullOrWhiteSpace(input)) product.ProductName = input;
+
+    // Edit Supplier
+    var suppliers = db.Suppliers.OrderBy(s => s.SupplierId).ToList();
+    Console.WriteLine($"Select Supplier ({product.SupplierId}):");
+    foreach (var s in suppliers)
+    {
+      Console.WriteLine($"{s.SupplierId}) {s.CompanyName}");
+    }
+    input = Console.ReadLine();
+    if (int.TryParse(input, out int supplierId) && suppliers.Any(s => s.SupplierId == supplierId))
+      product.SupplierId = supplierId;
+
+    // Edit Category
+    var categories = db.Categories.OrderBy(c => c.CategoryName).ToList();
+    Console.WriteLine($"Select Category ({product.CategoryId}):");
+    foreach (var c in categories)
+    {
+      Console.WriteLine($"{c.CategoryId}) {c.CategoryName}");
+    }
+    input = Console.ReadLine();
+    if (int.TryParse(input, out int categoryId) && categories.Any(c => c.CategoryId == categoryId))
+      product.CategoryId = categoryId;
+
+    Console.WriteLine($"Enter Quantity Per Unit ({product.QuantityPerUnit}):");
+    input = Console.ReadLine();
+    if (!string.IsNullOrWhiteSpace(input)) product.QuantityPerUnit = input;
+
+    Console.WriteLine($"Enter Unit Price ({product.UnitPrice}):");
+    input = Console.ReadLine();
+    if (decimal.TryParse(input, out decimal unitPrice)) product.UnitPrice = unitPrice;
+
+    Console.WriteLine($"Enter Units In Stock ({product.UnitsInStock}):");
+    input = Console.ReadLine();
+    if (short.TryParse(input, out short unitsInStock)) product.UnitsInStock = unitsInStock;
+
+    Console.WriteLine($"Enter Units On Order ({product.UnitsOnOrder}):");
+    input = Console.ReadLine();
+    if (short.TryParse(input, out short unitsOnOrder)) product.UnitsOnOrder = unitsOnOrder;
+
+    Console.WriteLine($"Enter Reorder Level ({product.ReorderLevel}):");
+    input = Console.ReadLine();
+    if (short.TryParse(input, out short reorderLevel)) product.ReorderLevel = reorderLevel;
+
+    Console.WriteLine($"Is Discontinued? (y/n, current: {(product.Discontinued ? "y" : "n")}):");
+    input = Console.ReadLine();
+    if (!string.IsNullOrWhiteSpace(input)) product.Discontinued = input.Equals("y", StringComparison.CurrentCultureIgnoreCase);
+
+    ValidationContext context = new(product, null, null);
+    List<ValidationResult> results = [];
+    var isValid = Validator.TryValidateObject(product, context, results, true);
+    if (isValid)
+    {
+      try
+      {
+        db.SaveChanges();
+        logger.Info($"Product '{product.ProductName}' updated successfully.");
+      }
+      catch (Exception ex)
+      {
+        logger.Error($"Error updating product: {ex.Message}");
       }
     }
     else
