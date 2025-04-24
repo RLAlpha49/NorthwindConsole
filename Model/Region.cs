@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace NorthwindConsole.Model;
+﻿namespace NorthwindConsole.Model;
 
 public partial class Region
 {
@@ -9,5 +6,5 @@ public partial class Region
 
     public string RegionDescription { get; set; } = null!;
 
-    public virtual ICollection<Territory> Territories { get; set; } = new List<Territory>();
+    public virtual ICollection<Territory> Territories { get; set; } = [];
 }

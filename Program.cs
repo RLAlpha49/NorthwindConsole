@@ -1,5 +1,4 @@
 ﻿using NLog;
-using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using NorthwindConsole.Model;
@@ -51,8 +50,8 @@ do
     category.CategoryName = Console.ReadLine()!;
     Console.WriteLine("Enter the Category Description:");
     category.Description = Console.ReadLine();
-    ValidationContext context = new ValidationContext(category, null, null);
-    List<ValidationResult> results = new List<ValidationResult>();
+    ValidationContext context = new(category, null, null);
+    List<ValidationResult> results = [];
 
     var isValid = Validator.TryValidateObject(category, context, results, true);
     if (isValid)
@@ -179,25 +178,31 @@ do
     string? discontinued = Console.ReadLine();
     product.Discontinued = discontinued?.ToLower() == "y";
 
-    // Validation (basic, as Product has no DataAnnotations)
-    if (string.IsNullOrWhiteSpace(product.ProductName))
+    ValidationContext context = new(product, null, null);
+    List<ValidationResult> results = [];
+    var isValid = Validator.TryValidateObject(product, context, results, true);
+    if (isValid)
     {
-      logger.Error("ProductName : Product name is required");
-      return;
+      try
+      {
+        db.Products.Add(product);
+        db.SaveChanges();
+        logger.Info($"Product '{product.ProductName}' added successfully.");
+      }
+      catch (Exception ex)
+      {
+        logger.Error($"Error adding product: {ex.Message}");
+      }
     }
-
-    try
+    else
     {
-      db.Products.Add(product);
-      db.SaveChanges();
-      logger.Info($"Product '{product.ProductName}' added successfully.");
-    }
-    catch (Exception ex)
-    {
-      logger.Error($"Error adding product: {ex.Message}");
+      foreach (var result in results)
+      {
+        logger.Error($"{result.MemberNames.FirstOrDefault() ?? ""} : {result.ErrorMessage}");
+      }
     }
   }
-  else if (String.IsNullOrEmpty(choice))
+  else if (string.IsNullOrEmpty(choice))
   {
     break;
   }

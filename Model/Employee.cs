@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace NorthwindConsole.Model;
+﻿namespace NorthwindConsole.Model;
 
 public partial class Employee
 {
@@ -35,11 +32,11 @@ public partial class Employee
 
     public int? ReportsTo { get; set; }
 
-    public virtual ICollection<Employee> InverseReportsToNavigation { get; set; } = new List<Employee>();
+    public virtual ICollection<Employee> InverseReportsToNavigation { get; set; } = [];
 
-    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+    public virtual ICollection<Order> Orders { get; set; } = [];
 
     public virtual Employee? ReportsToNavigation { get; set; }
 
-    public virtual ICollection<Territory> Territories { get; set; } = new List<Territory>();
+    public virtual ICollection<Territory> Territories { get; set; } = [];
 }

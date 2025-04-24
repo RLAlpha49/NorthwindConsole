@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace NorthwindConsole.Model;
+﻿namespace NorthwindConsole.Model;
 
 public partial class OrderDetail
 {

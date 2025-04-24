@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace NorthwindConsole.Model;
+﻿namespace NorthwindConsole.Model;
 
 public partial class Territory
 {
@@ -13,5 +10,5 @@ public partial class Territory
 
     public virtual Region Region { get; set; } = null!;
 
-    public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
+    public virtual ICollection<Employee> Employees { get; set; } = [];
 }

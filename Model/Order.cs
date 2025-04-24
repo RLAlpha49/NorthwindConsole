@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace NorthwindConsole.Model;
+﻿namespace NorthwindConsole.Model;
 
 public partial class Order
 {
@@ -37,7 +34,7 @@ public partial class Order
 
     public virtual Employee? Employee { get; set; }
 
-    public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+    public virtual ICollection<OrderDetail> OrderDetails { get; set; } = [];
 
     public virtual Shipper? ShipViaNavigation { get; set; }
 }
