@@ -17,6 +17,7 @@ do
   Console.WriteLine("2) Add category");
   Console.WriteLine("3) Display Category and related products");
   Console.WriteLine("4) Display all Categories and their related products");
+  Console.WriteLine("5) Add product");
   Console.WriteLine("Enter to quit");
   string? choice = Console.ReadLine();
   Console.Clear();
@@ -111,6 +112,89 @@ do
       {
         Console.WriteLine($"\t{p.ProductName}");
       }
+    }
+  }
+  else if (choice == "5")
+  {
+    // Add product
+    Product product = new();
+    Console.WriteLine("Enter Product Name:");
+    product.ProductName = Console.ReadLine()!;
+
+    // Select Supplier
+    var db = new DataContext();
+    var suppliers = db.Suppliers.OrderBy(s => s.CompanyName).ToList();
+    Console.WriteLine("Select Supplier:");
+    foreach (var s in suppliers)
+    {
+      Console.WriteLine($"{s.SupplierId}) {s.CompanyName}");
+    }
+    if (int.TryParse(Console.ReadLine(), out int supplierId) && suppliers.Any(s => s.SupplierId == supplierId))
+    {
+      product.SupplierId = supplierId;
+    }
+    else
+    {
+      logger.Error("Invalid supplier selection");
+      return;
+    }
+
+    // Select Category
+    var categories = db.Categories.OrderBy(c => c.CategoryName).ToList();
+    Console.WriteLine("Select Category:");
+    foreach (var c in categories)
+    {
+      Console.WriteLine($"{c.CategoryId}) {c.CategoryName}");
+    }
+    if (int.TryParse(Console.ReadLine(), out int categoryId) && categories.Any(c => c.CategoryId == categoryId))
+    {
+      product.CategoryId = categoryId;
+    }
+    else
+    {
+      logger.Error("Invalid category selection");
+      return;
+    }
+
+    Console.WriteLine("Enter Quantity Per Unit (optional):");
+    product.QuantityPerUnit = Console.ReadLine();
+
+    Console.WriteLine("Enter Unit Price (optional):");
+    if (decimal.TryParse(Console.ReadLine(), out decimal unitPrice))
+      product.UnitPrice = unitPrice;
+
+    Console.WriteLine("Enter Units In Stock (optional):");
+    if (short.TryParse(Console.ReadLine(), out short unitsInStock))
+      product.UnitsInStock = unitsInStock;
+
+    Console.WriteLine("Enter Units On Order (optional):");
+    if (short.TryParse(Console.ReadLine(), out short unitsOnOrder))
+      product.UnitsOnOrder = unitsOnOrder;
+
+    Console.WriteLine("Enter Reorder Level (optional):");
+    if (short.TryParse(Console.ReadLine(), out short reorderLevel))
+      product.ReorderLevel = reorderLevel;
+
+    Console.WriteLine("Is Discontinued? (y/n):");
+    string? discontinued = Console.ReadLine();
+    product.Discontinued = discontinued?.ToLower() == "y";
+
+    // Validation (basic, as Product has no DataAnnotations)
+    if (string.IsNullOrWhiteSpace(product.ProductName))
+    {
+      logger.Error("ProductName : Product name is required");
+      return;
+    }
+
+    try
+    {
+      db.Products.Add(product);
+      db.SaveChanges();
+      logger.Info($"Product '{product.ProductName}' added successfully.");
+    }
+    catch (Exception ex)
+    {
+      logger.Error($"Error adding product: {ex.Message}");
     }
   }
   else if (String.IsNullOrEmpty(choice))
