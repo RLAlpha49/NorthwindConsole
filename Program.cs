@@ -20,6 +20,7 @@ do
   Console.WriteLine("6) Edit product");
   Console.WriteLine("7) Display products");
   Console.WriteLine("8) Display a specific product");
+  Console.WriteLine("9) Edit category");
   Console.WriteLine("Enter to quit");
   string? choice = Console.ReadLine();
   Console.Clear();
@@ -398,6 +399,74 @@ do
       {
         logger.Error("Invalid product selection");
         Console.WriteLine("Invalid product selection.");
+      }
+    }
+  }
+  else if (choice == "9")
+  {
+    // Edit category
+    var db = new DataContext();
+    var categories = db.Categories.OrderBy(c => c.CategoryId).ToList();
+    if (categories.Count == 0)
+    {
+      logger.Info("No categories found to edit");
+      Console.WriteLine("No categories found.");
+      return;
+    }
+    Console.WriteLine("Select the Category to edit:");
+    foreach (var c in categories)
+    {
+      Console.WriteLine($"{c.CategoryId}) {c.CategoryName}");
+    }
+    if (!int.TryParse(Console.ReadLine(), out int categoryId) || !categories.Any(c => c.CategoryId == categoryId))
+    {
+      logger.Error("Invalid category selection");
+      Console.WriteLine("Invalid category selection.");
+      return;
+    }
+    var category = db.Categories.First(c => c.CategoryId == categoryId);
+    logger.Info($"Editing Category: {category.CategoryName} (ID: {category.CategoryId})");
+    Console.WriteLine($"Editing Category: {category.CategoryName}");
+
+    Console.WriteLine($"Enter Category Name ({category.CategoryName}):");
+    string? input = Console.ReadLine();
+    if (!string.IsNullOrWhiteSpace(input)) category.CategoryName = input;
+
+    Console.WriteLine($"Enter Description ({category.Description}):");
+    input = Console.ReadLine();
+    if (!string.IsNullOrWhiteSpace(input)) category.Description = input;
+
+    // Validate
+    ValidationContext context = new(category, null, null);
+    List<ValidationResult> results = [];
+    var isValid = Validator.TryValidateObject(category, context, results, true);
+    // Check for unique name (excluding self)
+    if (db.Categories.Any(c => c.CategoryId != category.CategoryId && c.CategoryName == category.CategoryName))
+    {
+      isValid = false;
+      results.Add(new ValidationResult("Name exists", ["CategoryName"]));
+      logger.Error($"Edit category failed: Name '{category.CategoryName}' already exists");
+    }
+    if (isValid)
+    {
+      try
+      {
+        db.SaveChanges();
+        logger.Info($"Category '{category.CategoryName}' updated successfully.");
+        Console.WriteLine($"Category '{category.CategoryName}' updated successfully.");
+      }
+      catch (Exception ex)
+      {
+        logger.Error($"Error updating category: {ex.Message}");
+        Console.WriteLine($"Error updating category: {ex.Message}");
+      }
+    }
+    else
+    {
+      foreach (var result in results)
+      {
+        logger.Error($"{result.MemberNames.FirstOrDefault() ?? ""} : {result.ErrorMessage}");
+        Console.WriteLine($"{result.MemberNames.FirstOrDefault() ?? ""} : {result.ErrorMessage}");
       }
     }
   }
