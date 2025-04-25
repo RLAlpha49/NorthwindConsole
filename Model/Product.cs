@@ -15,7 +15,6 @@ public partial class Product
     [Required(ErrorMessage = "Category is required.")]
     public int? CategoryId { get; set; }
 
-    [StringLength(20, ErrorMessage = "Quantity per unit cannot exceed 20 characters.")]
     public string? QuantityPerUnit { get; set; }
 
     [Range(0, double.MaxValue, ErrorMessage = "Unit price must be non-negative.")]
