@@ -86,16 +86,22 @@ do
         }
         catch (Exception ex)
         {
-          logger.Error($"Error adding category: {ex.Message}");
+          logger.Error(ex, "Error adding category");
+          Console.ForegroundColor = ConsoleColor.Red;
+          Console.WriteLine("An error occurred while adding the category. Please try again.");
+          Console.ForegroundColor = ConsoleColor.White;
         }
       }
     }
     if (!isValid)
     {
+      Console.ForegroundColor = ConsoleColor.Red;
       foreach (var result in results)
       {
-        logger.Error($"{result.MemberNames.First()} : {result.ErrorMessage}");
+        logger.Error($"{result.MemberNames.FirstOrDefault() ?? ""} : {result.ErrorMessage}");
+        Console.WriteLine(result.ErrorMessage);
       }
+      Console.ForegroundColor = ConsoleColor.White;
     }
   }
   else if (choice == "3")
@@ -113,7 +119,10 @@ do
     if (!int.TryParse(Console.ReadLine(), out int id) || !query.Any(c => c.CategoryId == id))
     {
       logger.Error("Invalid category selection");
-      return;
+      Console.ForegroundColor = ConsoleColor.Red;
+      Console.WriteLine("Invalid selection. Please enter a valid category number.");
+      Console.ForegroundColor = ConsoleColor.White;
+      continue;
     }
     Console.Clear();
     logger.Info($"CategoryId {id} selected");
@@ -160,7 +169,7 @@ do
     else
     {
       logger.Error("Invalid supplier selection");
-      return;
+      continue;
     }
 
     // Select Category
@@ -178,7 +187,7 @@ do
     else
     {
       logger.Error("Invalid category selection");
-      return;
+      continue;
     }
 
     Console.WriteLine("Enter Quantity Per Unit (optional):");
@@ -240,7 +249,7 @@ do
     if (!int.TryParse(Console.ReadLine(), out int productId) || !products.Any(p => p.ProductId == productId))
     {
       logger.Error("Invalid product selection");
-      return;
+      continue;
     }
     var product = db.Products.First(p => p.ProductId == productId);
     Console.WriteLine($"Editing Product: {product.ProductName}");
@@ -406,7 +415,7 @@ do
     {
       logger.Info("No categories found to edit");
       Console.WriteLine("No categories found.");
-      return;
+      continue;
     }
     Console.WriteLine("Select the Category to edit:");
     foreach (var c in categories)
@@ -416,7 +425,7 @@ do
     if (!int.TryParse(Console.ReadLine(), out int categoryId) || !categories.Any(c => c.CategoryId == categoryId))
     {
       logger.Error("Invalid category selection");
-      return;
+      continue;
     }
     var category = db.Categories.First(c => c.CategoryId == categoryId);
     logger.Info($"Editing Category: {category.CategoryName} (ID: {category.CategoryId})");
@@ -488,7 +497,7 @@ do
     if (categories.Count == 0)
     {
       Console.WriteLine("No categories found.");
-      return;
+      continue;
     }
     Console.WriteLine("Select the Category to view active products:");
     foreach (var c in categories)
@@ -498,7 +507,7 @@ do
     if (!int.TryParse(Console.ReadLine(), out int categoryId) || !categories.Any(c => c.CategoryId == categoryId))
     {
       Console.WriteLine("Invalid category selection.");
-      return;
+      continue;
     }
     var category = db.Categories.Include("Products").First(c => c.CategoryId == categoryId);
     var activeProducts = category.Products.Where(p => !p.Discontinued).OrderBy(p => p.ProductName).ToList();
@@ -516,7 +525,7 @@ do
     {
       logger.Info("No products found to delete");
       Console.WriteLine("No products found.");
-      return;
+      continue;
     }
     Console.WriteLine("Select the Product to delete:");
     foreach (var p in products)
@@ -526,7 +535,7 @@ do
     if (!int.TryParse(Console.ReadLine(), out int productId) || !products.Any(p => p.ProductId == productId))
     {
       logger.Error("Invalid product selection");
-      return;
+      continue;
     }
     var product = db.Products.Include(p => p.OrderDetails).First(p => p.ProductId == productId);
     // Delete related OrderDetails
@@ -553,7 +562,7 @@ do
     if (categories.Count == 0)
     {
       logger.Info("No categories found to delete");
-      return;
+      continue;
     }
     Console.WriteLine("Select the Category to delete:");
     foreach (var c in categories)
@@ -563,7 +572,7 @@ do
     if (!int.TryParse(Console.ReadLine(), out int categoryId) || !categories.Any(c => c.CategoryId == categoryId))
     {
       logger.Error("Invalid category selection");
-      return;
+      continue;
     }
     var category = db.Categories.Include(c => c.Products).ThenInclude(p => p.OrderDetails).First(c => c.CategoryId == categoryId);
     // Delete related OrderDetails for each product
