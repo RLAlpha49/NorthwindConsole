@@ -36,11 +36,14 @@ do
     var db = new DataContext();
     var query = db.Categories.OrderBy(p => p.CategoryName);
 
+    int count = query.Count();
+    logger.Info($"{count} categories returned");
     Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine($"{query.Count()} records returned");
+    Console.WriteLine($"{count} records returned");
     Console.ForegroundColor = ConsoleColor.Magenta;
     foreach (var item in query)
     {
+      logger.Info($"Category displayed: {item.CategoryName}");
       Console.WriteLine($"{item.CategoryName} - {item.Description}");
     }
     Console.ForegroundColor = ConsoleColor.White;
@@ -66,6 +69,7 @@ do
         // generate validation error
         isValid = false;
         results.Add(new ValidationResult("Name exists", ["CategoryName"]));
+        logger.Error($"Add category failed: Name '{category.CategoryName}' already exists");
       }
       else
       {
@@ -93,13 +97,19 @@ do
       Console.WriteLine($"{item.CategoryId}) {item.CategoryName}");
     }
     Console.ForegroundColor = ConsoleColor.White;
-    int id = int.Parse(Console.ReadLine()!);
+    if (!int.TryParse(Console.ReadLine(), out int id) || !query.Any(c => c.CategoryId == id))
+    {
+      logger.Error("Invalid category selection");
+      return;
+    }
     Console.Clear();
     logger.Info($"CategoryId {id} selected");
     Category category = db.Categories.Include("Products").FirstOrDefault(c => c.CategoryId == id)!;
+    logger.Info($"Displaying category: {category.CategoryName}");
     Console.WriteLine($"{category.CategoryName} - {category.Description}");
     foreach (Product p in category.Products)
     {
+      logger.Info($"Product displayed: {p.ProductName}");
       Console.WriteLine($"\t{p.ProductName}");
     }
   }
@@ -109,9 +119,11 @@ do
     var query = db.Categories.Include("Products").OrderBy(p => p.CategoryId);
     foreach (var item in query)
     {
+      logger.Info($"Displaying category: {item.CategoryName}");
       Console.WriteLine($"{item.CategoryName}");
       foreach (Product p in item.Products)
       {
+        logger.Info($"Product displayed: {p.ProductName}");
         Console.WriteLine($"\t{p.ProductName}");
       }
     }
@@ -134,6 +146,7 @@ do
     if (int.TryParse(Console.ReadLine(), out int supplierId) && suppliers.Any(s => s.SupplierId == supplierId))
     {
       product.SupplierId = supplierId;
+      logger.Info($"Supplier selected: {supplierId}");
     }
     else
     {
@@ -151,6 +164,7 @@ do
     if (int.TryParse(Console.ReadLine(), out int categoryId) && categories.Any(c => c.CategoryId == categoryId))
     {
       product.CategoryId = categoryId;
+      logger.Info($"Category selected: {categoryId}");
     }
     else
     {
@@ -220,6 +234,7 @@ do
       return;
     }
     var product = db.Products.First(p => p.ProductId == productId);
+    logger.Info($"Editing Product: {product.ProductName} (ID: {product.ProductId})");
     Console.WriteLine($"Editing Product: {product.ProductName}");
 
     Console.WriteLine($"Enter Product Name ({product.ProductName}):");
@@ -307,12 +322,19 @@ do
     if (prodChoice == "2")
     {
       query = query.Where(p => p.Discontinued);
+      logger.Info("Displaying discontinued products");
     }
     else if (prodChoice == "3")
     {
       query = query.Where(p => !p.Discontinued);
+      logger.Info("Displaying active products");
+    }
+    else
+    {
+      logger.Info("Displaying all products");
     }
     var products = query.ToList();
+    logger.Info($"{products.Count} products returned");
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine($"{products.Count} records returned");
     Console.ForegroundColor = ConsoleColor.White;
@@ -320,12 +342,14 @@ do
     {
       if (p.Discontinued)
       {
+        logger.Info($"Product displayed: {p.ProductName} (Discontinued)");
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine($"{p.ProductName} (Discontinued)");
         Console.ForegroundColor = ConsoleColor.White;
       }
       else
       {
+        logger.Info($"Product displayed: {p.ProductName}");
         Console.WriteLine(p.ProductName);
       }
     }
@@ -336,6 +360,7 @@ do
     var products = db.Products.OrderBy(p => p.ProductId).ToList();
     if (products.Count == 0)
     {
+      logger.Info("No products found to display");
       Console.WriteLine("No products found.");
     }
     else
@@ -348,6 +373,7 @@ do
       if (int.TryParse(Console.ReadLine(), out int productId) && products.Any(p => p.ProductId == productId))
       {
         var product = products.First(p => p.ProductId == productId);
+        logger.Info($"Viewing product details: {product.ProductName} (ID: {product.ProductId})");
         Console.WriteLine($"ProductId: {product.ProductId}");
         Console.WriteLine($"ProductName: {product.ProductName}");
         Console.WriteLine($"SupplierId: {product.SupplierId}");
@@ -361,6 +387,7 @@ do
       }
       else
       {
+        logger.Error("Invalid product selection");
         Console.WriteLine("Invalid product selection.");
       }
     }
