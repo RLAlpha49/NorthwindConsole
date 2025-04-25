@@ -5,9 +5,7 @@ namespace NorthwindConsole.Model;
 public partial class DataContext : DbContext
 {
     public DataContext(DbContextOptions<DataContext> options)
-        : base(options)
-    {
-    }
+        : base(options) { }
 
     public virtual DbSet<Category> Categories { get; set; }
 
@@ -65,34 +63,41 @@ public partial class DataContext : DbContext
             entity.Property(e => e.Title).HasMaxLength(30);
             entity.Property(e => e.TitleOfCourtesy).HasMaxLength(25);
 
-            entity.HasOne(d => d.ReportsToNavigation).WithMany(p => p.InverseReportsToNavigation)
+            entity
+                .HasOne(d => d.ReportsToNavigation)
+                .WithMany(p => p.InverseReportsToNavigation)
                 .HasForeignKey(d => d.ReportsTo)
                 .HasConstraintName("FK_Employees_Employees");
 
-            entity.HasMany(d => d.Territories).WithMany(p => p.Employees)
+            entity
+                .HasMany(d => d.Territories)
+                .WithMany(p => p.Employees)
                 .UsingEntity<Dictionary<string, object>>(
                     "EmployeeTerritory",
-                    r => r.HasOne<Territory>().WithMany()
-                        .HasForeignKey("TerritoryId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK_EmployeeTerritories_Territories"),
-                    l => l.HasOne<Employee>().WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK_EmployeeTerritories_Employees"),
+                    r =>
+                        r.HasOne<Territory>()
+                            .WithMany()
+                            .HasForeignKey("TerritoryId")
+                            .OnDelete(DeleteBehavior.ClientSetNull)
+                            .HasConstraintName("FK_EmployeeTerritories_Territories"),
+                    l =>
+                        l.HasOne<Employee>()
+                            .WithMany()
+                            .HasForeignKey("EmployeeId")
+                            .OnDelete(DeleteBehavior.ClientSetNull)
+                            .HasConstraintName("FK_EmployeeTerritories_Employees"),
                     j =>
                     {
                         j.HasKey("EmployeeId", "TerritoryId").IsClustered(false);
                         j.ToTable("EmployeeTerritories");
                         j.IndexerProperty<string>("TerritoryId").HasMaxLength(20);
-                    });
+                    }
+                );
         });
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.Property(e => e.Freight)
-                .HasDefaultValue(0m)
-                .HasColumnType("money");
+            entity.Property(e => e.Freight).HasDefaultValue(0m).HasColumnType("money");
             entity.Property(e => e.OrderDate).HasColumnType("datetime");
             entity.Property(e => e.RequiredDate).HasColumnType("datetime");
             entity.Property(e => e.ShipAddress).HasMaxLength(60);
@@ -103,15 +108,21 @@ public partial class DataContext : DbContext
             entity.Property(e => e.ShipRegion).HasMaxLength(15);
             entity.Property(e => e.ShippedDate).HasColumnType("datetime");
 
-            entity.HasOne(d => d.Customer).WithMany(p => p.Orders)
+            entity
+                .HasOne(d => d.Customer)
+                .WithMany(p => p.Orders)
                 .HasForeignKey(d => d.CustomerId)
                 .HasConstraintName("FK_Orders_Customers");
 
-            entity.HasOne(d => d.Employee).WithMany(p => p.Orders)
+            entity
+                .HasOne(d => d.Employee)
+                .WithMany(p => p.Orders)
                 .HasForeignKey(d => d.EmployeeId)
                 .HasConstraintName("FK_Orders_Employees");
 
-            entity.HasOne(d => d.ShipViaNavigation).WithMany(p => p.Orders)
+            entity
+                .HasOne(d => d.ShipViaNavigation)
+                .WithMany(p => p.Orders)
                 .HasForeignKey(d => d.ShipVia)
                 .HasConstraintName("FK_Orders_Shippers");
         });
@@ -124,12 +135,16 @@ public partial class DataContext : DbContext
             entity.Property(e => e.Quantity).HasDefaultValue((short)1);
             entity.Property(e => e.UnitPrice).HasColumnType("money");
 
-            entity.HasOne(d => d.Order).WithMany(p => p.OrderDetails)
+            entity
+                .HasOne(d => d.Order)
+                .WithMany(p => p.OrderDetails)
                 .HasForeignKey(d => d.OrderId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_OrderDetails_Orders");
 
-            entity.HasOne(d => d.Product).WithMany(p => p.OrderDetails)
+            entity
+                .HasOne(d => d.Product)
+                .WithMany(p => p.OrderDetails)
                 .HasForeignKey(d => d.ProductId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_OrderDetails_Products");
@@ -140,17 +155,19 @@ public partial class DataContext : DbContext
             entity.Property(e => e.ProductName).HasMaxLength(40);
             entity.Property(e => e.QuantityPerUnit).HasMaxLength(20);
             entity.Property(e => e.ReorderLevel).HasDefaultValue((short)0);
-            entity.Property(e => e.UnitPrice)
-                .HasDefaultValue(0m)
-                .HasColumnType("money");
+            entity.Property(e => e.UnitPrice).HasDefaultValue(0m).HasColumnType("money");
             entity.Property(e => e.UnitsInStock).HasDefaultValue((short)0);
             entity.Property(e => e.UnitsOnOrder).HasDefaultValue((short)0);
 
-            entity.HasOne(d => d.Category).WithMany(p => p.Products)
+            entity
+                .HasOne(d => d.Category)
+                .WithMany(p => p.Products)
                 .HasForeignKey(d => d.CategoryId)
                 .HasConstraintName("FK_Products_Categories");
 
-            entity.HasOne(d => d.Supplier).WithMany(p => p.Products)
+            entity
+                .HasOne(d => d.Supplier)
+                .WithMany(p => p.Products)
                 .HasForeignKey(d => d.SupplierId)
                 .HasConstraintName("FK_Products_Suppliers");
         });
@@ -192,7 +209,9 @@ public partial class DataContext : DbContext
             entity.Property(e => e.TerritoryId).HasMaxLength(20);
             entity.Property(e => e.TerritoryDescription).HasMaxLength(50);
 
-            entity.HasOne(d => d.Region).WithMany(p => p.Territories)
+            entity
+                .HasOne(d => d.Region)
+                .WithMany(p => p.Territories)
                 .HasForeignKey(d => d.RegionId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Territories_Region");

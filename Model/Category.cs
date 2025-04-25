@@ -4,11 +4,12 @@ namespace NorthwindConsole.Model;
 
 public partial class Category
 {
-  public int CategoryId { get; set; }
-  [Required(ErrorMessage = "YO - Enter the name!")]
-  public string CategoryName { get; set; } = null!;
+    public int CategoryId { get; set; }
 
-  public string? Description { get; set; }
+    [Required(ErrorMessage = "YO - Enter the name!")]
+    public string CategoryName { get; set; } = null!;
 
-  public virtual ICollection<Product> Products { get; set; } = [];
+    public string? Description { get; set; }
+
+    public virtual ICollection<Product> Products { get; set; } = [];
 }

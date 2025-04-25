@@ -1,4 +1,5 @@
 ﻿namespace NorthwindConsole.Model;
+
 using System.ComponentModel.DataAnnotations;
 
 public partial class Shipper
