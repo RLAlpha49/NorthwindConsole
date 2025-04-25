@@ -23,6 +23,7 @@ do
   Console.WriteLine("9) Edit category");
   Console.WriteLine("10) Display all Categories and their active products");
   Console.WriteLine("11) Display a specific Category and its active products");
+  Console.WriteLine("12) Delete product");
   Console.WriteLine("Enter to quit");
   string? choice = Console.ReadLine();
   Console.Clear();
@@ -392,7 +393,6 @@ do
       else
       {
         logger.Error("Invalid product selection");
-        Console.WriteLine("Invalid product selection.");
       }
     }
   }
@@ -415,7 +415,6 @@ do
     if (!int.TryParse(Console.ReadLine(), out int categoryId) || !categories.Any(c => c.CategoryId == categoryId))
     {
       logger.Error("Invalid category selection");
-      Console.WriteLine("Invalid category selection.");
       return;
     }
     var category = db.Categories.First(c => c.CategoryId == categoryId);
@@ -452,7 +451,6 @@ do
       catch (Exception ex)
       {
         logger.Error($"Error updating category: {ex.Message}");
-        Console.WriteLine($"Error updating category: {ex.Message}");
       }
     }
     else
@@ -460,7 +458,6 @@ do
       foreach (var result in results)
       {
         logger.Error($"{result.MemberNames.FirstOrDefault() ?? ""} : {result.ErrorMessage}");
-        Console.WriteLine($"{result.MemberNames.FirstOrDefault() ?? ""} : {result.ErrorMessage}");
       }
     }
   }
@@ -508,6 +505,44 @@ do
     foreach (var product in activeProducts)
     {
       Console.WriteLine($"\t{product.ProductName}");
+    }
+  }
+  else if (choice == "12")
+  {
+    var db = new DataContext();
+    var products = db.Products.OrderBy(p => p.ProductId).ToList();
+    if (products.Count == 0)
+    {
+      logger.Info("No products found to delete");
+      Console.WriteLine("No products found.");
+      return;
+    }
+    Console.WriteLine("Select the Product to delete:");
+    foreach (var p in products)
+    {
+      Console.WriteLine($"{p.ProductId}) {p.ProductName}");
+    }
+    if (!int.TryParse(Console.ReadLine(), out int productId) || !products.Any(p => p.ProductId == productId))
+    {
+      logger.Error("Invalid product selection");
+      return;
+    }
+    var product = db.Products.Include(p => p.OrderDetails).First(p => p.ProductId == productId);
+    // Delete related OrderDetails
+    var orderDetails = db.OrderDetails.Where(od => od.ProductId == productId).ToList();
+    foreach (var od in orderDetails)
+    {
+      db.OrderDetails.Remove(od);
+    }
+    db.Products.Remove(product);
+    try
+    {
+      db.SaveChanges();
+      Console.WriteLine($"Product '{product.ProductName}' and its related order details deleted successfully.");
+    }
+    catch (Exception ex)
+    {
+      logger.Error($"Error deleting product: {ex.Message}");
     }
   }
   else if (string.IsNullOrEmpty(choice))
