@@ -24,6 +24,7 @@ do
   Console.WriteLine("10) Display all Categories and their active products");
   Console.WriteLine("11) Display a specific Category and its active products");
   Console.WriteLine("12) Delete product");
+  Console.WriteLine("13) Delete category");
   Console.WriteLine("Enter to quit");
   string? choice = Console.ReadLine();
   Console.Clear();
@@ -543,6 +544,46 @@ do
     catch (Exception ex)
     {
       logger.Error($"Error deleting product: {ex.Message}");
+    }
+  }
+  else if (choice == "13")
+  {
+    var db = new DataContext();
+    var categories = db.Categories.OrderBy(c => c.CategoryId).ToList();
+    if (categories.Count == 0)
+    {
+      logger.Info("No categories found to delete");
+      return;
+    }
+    Console.WriteLine("Select the Category to delete:");
+    foreach (var c in categories)
+    {
+      Console.WriteLine($"{c.CategoryId}) {c.CategoryName}");
+    }
+    if (!int.TryParse(Console.ReadLine(), out int categoryId) || !categories.Any(c => c.CategoryId == categoryId))
+    {
+      logger.Error("Invalid category selection");
+      return;
+    }
+    var category = db.Categories.Include(c => c.Products).ThenInclude(p => p.OrderDetails).First(c => c.CategoryId == categoryId);
+    // Delete related OrderDetails for each product
+    foreach (var product in category.Products.ToList())
+    {
+      foreach (var od in product.OrderDetails.ToList())
+      {
+        db.OrderDetails.Remove(od);
+      }
+      db.Products.Remove(product);
+    }
+    db.Categories.Remove(category);
+    try
+    {
+      db.SaveChanges();
+      logger.Info($"Category '{category.CategoryName}', its products, and their order details deleted successfully.");
+    }
+    catch (Exception ex)
+    {
+      logger.Error($"Error deleting category: {ex.Message}");
     }
   }
   else if (string.IsNullOrEmpty(choice))
