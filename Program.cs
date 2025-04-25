@@ -22,6 +22,7 @@ do
   Console.WriteLine("8) Display a specific product");
   Console.WriteLine("9) Edit category");
   Console.WriteLine("10) Display all Categories and their active products");
+  Console.WriteLine("11) Display a specific Category and its active products");
   Console.WriteLine("Enter to quit");
   string? choice = Console.ReadLine();
   Console.Clear();
@@ -479,6 +480,34 @@ do
         totalProducts++;
       }
       totalCategories++;
+    }
+  }
+  else if (choice == "11")
+  {
+    // Display a specific category and its related active products
+    var db = new DataContext();
+    var categories = db.Categories.OrderBy(c => c.CategoryId).ToList();
+    if (categories.Count == 0)
+    {
+      Console.WriteLine("No categories found.");
+      return;
+    }
+    Console.WriteLine("Select the Category to view active products:");
+    foreach (var c in categories)
+    {
+      Console.WriteLine($"{c.CategoryId}) {c.CategoryName}");
+    }
+    if (!int.TryParse(Console.ReadLine(), out int categoryId) || !categories.Any(c => c.CategoryId == categoryId))
+    {
+      Console.WriteLine("Invalid category selection.");
+      return;
+    }
+    var category = db.Categories.Include("Products").First(c => c.CategoryId == categoryId);
+    var activeProducts = category.Products.Where(p => !p.Discontinued).OrderBy(p => p.ProductName).ToList();
+    Console.WriteLine($"{category.CategoryName}");
+    foreach (var product in activeProducts)
+    {
+      Console.WriteLine($"\t{product.ProductName}");
     }
   }
   else if (string.IsNullOrEmpty(choice))
