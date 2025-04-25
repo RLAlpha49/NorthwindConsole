@@ -21,6 +21,7 @@ do
   Console.WriteLine("7) Display products");
   Console.WriteLine("8) Display a specific product");
   Console.WriteLine("9) Edit category");
+  Console.WriteLine("10) Display all Categories and their active products");
   Console.WriteLine("Enter to quit");
   string? choice = Console.ReadLine();
   Console.Clear();
@@ -44,7 +45,6 @@ do
     Console.ForegroundColor = ConsoleColor.Magenta;
     foreach (var item in query)
     {
-      logger.Info($"Category displayed: {item.CategoryName}");
       Console.WriteLine($"{item.CategoryName} - {item.Description}");
     }
     Console.ForegroundColor = ConsoleColor.White;
@@ -115,11 +115,9 @@ do
     Console.Clear();
     logger.Info($"CategoryId {id} selected");
     Category category = db.Categories.Include("Products").FirstOrDefault(c => c.CategoryId == id)!;
-    logger.Info($"Displaying category: {category.CategoryName}");
     Console.WriteLine($"{category.CategoryName} - {category.Description}");
     foreach (Product p in category.Products)
     {
-      logger.Info($"Product displayed: {p.ProductName}");
       Console.WriteLine($"\t{p.ProductName}");
     }
   }
@@ -129,11 +127,9 @@ do
     var query = db.Categories.Include("Products").OrderBy(p => p.CategoryId);
     foreach (var item in query)
     {
-      logger.Info($"Displaying category: {item.CategoryName}");
       Console.WriteLine($"{item.CategoryName}");
       foreach (Product p in item.Products)
       {
-        logger.Info($"Product displayed: {p.ProductName}");
         Console.WriteLine($"\t{p.ProductName}");
       }
     }
@@ -244,7 +240,6 @@ do
       return;
     }
     var product = db.Products.First(p => p.ProductId == productId);
-    logger.Info($"Editing Product: {product.ProductName} (ID: {product.ProductId})");
     Console.WriteLine($"Editing Product: {product.ProductName}");
 
     Console.WriteLine($"Enter Product Name ({product.ProductName}):");
@@ -352,14 +347,12 @@ do
     {
       if (p.Discontinued)
       {
-        logger.Info($"Product displayed: {p.ProductName} (Discontinued)");
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine($"{p.ProductName} (Discontinued)");
         Console.ForegroundColor = ConsoleColor.White;
       }
       else
       {
-        logger.Info($"Product displayed: {p.ProductName}");
         Console.WriteLine(p.ProductName);
       }
     }
@@ -468,6 +461,24 @@ do
         logger.Error($"{result.MemberNames.FirstOrDefault() ?? ""} : {result.ErrorMessage}");
         Console.WriteLine($"{result.MemberNames.FirstOrDefault() ?? ""} : {result.ErrorMessage}");
       }
+    }
+  }
+  else if (choice == "10")
+  {
+    // Display all categories and their related active products
+    var db = new DataContext();
+    var query = db.Categories.Include("Products").OrderBy(c => c.CategoryId);
+    int totalCategories = 0, totalProducts = 0;
+    foreach (var category in query)
+    {
+      var activeProducts = category.Products.Where(p => !p.Discontinued).OrderBy(p => p.ProductName).ToList();
+      Console.WriteLine($"{category.CategoryName}");
+      foreach (var product in activeProducts)
+      {
+        Console.WriteLine($"\t{product.ProductName}");
+        totalProducts++;
+      }
+      totalCategories++;
     }
   }
   else if (string.IsNullOrEmpty(choice))
