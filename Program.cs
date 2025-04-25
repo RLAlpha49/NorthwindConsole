@@ -19,6 +19,7 @@ do
   Console.WriteLine("5) Add product");
   Console.WriteLine("6) Edit product");
   Console.WriteLine("7) Display products");
+  Console.WriteLine("8) Display a specific product");
   Console.WriteLine("Enter to quit");
   string? choice = Console.ReadLine();
   Console.Clear();
@@ -326,6 +327,41 @@ do
       else
       {
         Console.WriteLine(p.ProductName);
+      }
+    }
+  }
+  else if (choice == "8")
+  {
+    var db = new DataContext();
+    var products = db.Products.OrderBy(p => p.ProductId).ToList();
+    if (products.Count == 0)
+    {
+      Console.WriteLine("No products found.");
+    }
+    else
+    {
+      Console.WriteLine("Select a product to view details:");
+      foreach (var p in products)
+      {
+        Console.WriteLine($"{p.ProductId}) {p.ProductName}");
+      }
+      if (int.TryParse(Console.ReadLine(), out int productId) && products.Any(p => p.ProductId == productId))
+      {
+        var product = products.First(p => p.ProductId == productId);
+        Console.WriteLine($"ProductId: {product.ProductId}");
+        Console.WriteLine($"ProductName: {product.ProductName}");
+        Console.WriteLine($"SupplierId: {product.SupplierId}");
+        Console.WriteLine($"CategoryId: {product.CategoryId}");
+        Console.WriteLine($"QuantityPerUnit: {product.QuantityPerUnit}");
+        Console.WriteLine($"UnitPrice: {product.UnitPrice}");
+        Console.WriteLine($"UnitsInStock: {product.UnitsInStock}");
+        Console.WriteLine($"UnitsOnOrder: {product.UnitsOnOrder}");
+        Console.WriteLine($"ReorderLevel: {product.ReorderLevel}");
+        Console.WriteLine($"Discontinued: {(product.Discontinued ? "Yes" : "No")}");
+      }
+      else
+      {
+        Console.WriteLine("Invalid product selection.");
       }
     }
   }
