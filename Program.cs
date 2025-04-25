@@ -18,6 +18,7 @@ do
   Console.WriteLine("4) Display all Categories and their related products");
   Console.WriteLine("5) Add product");
   Console.WriteLine("6) Edit product");
+  Console.WriteLine("7) Display products");
   Console.WriteLine("Enter to quit");
   string? choice = Console.ReadLine();
   Console.Clear();
@@ -290,6 +291,41 @@ do
       foreach (var result in results)
       {
         logger.Error($"{result.MemberNames.FirstOrDefault() ?? ""} : {result.ErrorMessage}");
+      }
+    }
+  }
+  else if (choice == "7")
+  {
+    var db = new DataContext();
+    Console.WriteLine("Display products:");
+    Console.WriteLine("1) All products");
+    Console.WriteLine("2) Discontinued products");
+    Console.WriteLine("3) Active products");
+    string? prodChoice = Console.ReadLine();
+    IQueryable<Product> query = db.Products.OrderBy(p => p.ProductName);
+    if (prodChoice == "2")
+    {
+      query = query.Where(p => p.Discontinued);
+    }
+    else if (prodChoice == "3")
+    {
+      query = query.Where(p => !p.Discontinued);
+    }
+    var products = query.ToList();
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine($"{products.Count} records returned");
+    Console.ForegroundColor = ConsoleColor.White;
+    foreach (var p in products)
+    {
+      if (p.Discontinued)
+      {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"{p.ProductName} (Discontinued)");
+        Console.ForegroundColor = ConsoleColor.White;
+      }
+      else
+      {
+        Console.WriteLine(p.ProductName);
       }
     }
   }
