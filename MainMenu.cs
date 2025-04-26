@@ -19,25 +19,19 @@ namespace NorthwindConsole
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("[Categories]");
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("  1) Display categories");
-                Console.WriteLine("  2) Add category");
-                Console.WriteLine("  3) Edit category");
-                Console.WriteLine("  4) Delete category");
-                Console.WriteLine();
-                Console.WriteLine("  5) Display Category and related products");
-                Console.WriteLine("  6) Display all Categories and their related products");
-                Console.WriteLine("  7) Display all Categories and their active products");
-                Console.WriteLine("  8) Display a specific Category and its active products");
+                Console.WriteLine("  1) View Category Options");
                 Console.WriteLine();
 
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("[Products]");
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("  9) Display products");
-                Console.WriteLine(" 10) Add product");
-                Console.WriteLine(" 11) Edit product");
-                Console.WriteLine(" 12) Delete product");
-                Console.WriteLine(" 13) Display a specific product");
+                Console.WriteLine("  2) View Product Options");
+                Console.WriteLine();
+
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.WriteLine("[Statistics]");
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.WriteLine("  3) View Statistics Options");
                 Console.WriteLine();
 
                 Console.ForegroundColor = ConsoleColor.Cyan;
@@ -51,43 +45,13 @@ namespace NorthwindConsole
                 switch (choice)
                 {
                     case "1":
-                        CategoryActions.DisplayCategories(logger);
+                        CategoryActions.ShowCategoryMenu(logger);
                         break;
                     case "2":
-                        CategoryActions.AddCategory(logger);
+                        ProductActions.ShowProductMenu(logger);
                         break;
                     case "3":
-                        CategoryActions.EditCategory(logger);
-                        break;
-                    case "4":
-                        CategoryActions.DeleteCategory(logger);
-                        break;
-                    case "5":
-                        CategoryActions.DisplayCategoryAndProducts(logger);
-                        break;
-                    case "6":
-                        CategoryActions.DisplayAllCategoriesAndProducts(logger);
-                        break;
-                    case "7":
-                        CategoryActions.DisplayAllCategoriesAndActiveProducts(logger);
-                        break;
-                    case "8":
-                        CategoryActions.DisplayCategoryAndActiveProducts(logger);
-                        break;
-                    case "9":
-                        ProductActions.DisplayProducts(logger);
-                        break;
-                    case "10":
-                        ProductActions.AddProduct(logger);
-                        break;
-                    case "11":
-                        ProductActions.EditProduct(logger);
-                        break;
-                    case "12":
-                        ProductActions.DeleteProduct(logger);
-                        break;
-                    case "13":
-                        ProductActions.DisplayProductDetails(logger);
+                        StatisticsActions.ShowStatisticsMenu(logger);
                         break;
                     case null:
                     case "":

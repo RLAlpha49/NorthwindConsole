@@ -324,5 +324,50 @@ namespace NorthwindConsole
                 logger.Error($"Error deleting product: {ex.Message}");
             }
         }
+
+        public static void ShowProductMenu(Logger logger)
+        {
+            while (true)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("========================================");
+                Console.WriteLine("           Product Menu");
+                Console.WriteLine("========================================");
+                Console.WriteLine(" 1) Display products");
+                Console.WriteLine(" 2) Add product");
+                Console.WriteLine(" 3) Edit product");
+                Console.WriteLine(" 4) Delete product");
+                Console.WriteLine(" 5) Display a specific product");
+                Console.WriteLine(" [Enter] to return to main menu");
+                Console.WriteLine("----------------------------------------");
+                Console.ForegroundColor = ConsoleColor.White;
+                string? choice = Console.ReadLine();
+                Console.Clear();
+                switch (choice)
+                {
+                    case "1":
+                        DisplayProducts(logger);
+                        break;
+                    case "2":
+                        AddProduct(logger);
+                        break;
+                    case "3":
+                        EditProduct(logger);
+                        break;
+                    case "4":
+                        DeleteProduct(logger);
+                        break;
+                    case "5":
+                        DisplayProductDetails(logger);
+                        break;
+                    case null:
+                    case "":
+                        return;
+                    default:
+                        Console.WriteLine("Invalid option. Please try again.");
+                        break;
+                }
+            }
+        }
     }
 }

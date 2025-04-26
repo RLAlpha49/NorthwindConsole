@@ -306,5 +306,62 @@ namespace NorthwindConsole
                 logger.Error($"Error deleting category: {ex.Message}");
             }
         }
+
+        public static void ShowCategoryMenu(Logger logger)
+        {
+            while (true)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("========================================");
+                Console.WriteLine("           Category Menu");
+                Console.WriteLine("========================================");
+                Console.WriteLine(" 1) Display categories");
+                Console.WriteLine(" 2) Add category");
+                Console.WriteLine(" 3) Edit category");
+                Console.WriteLine(" 4) Delete category");
+                Console.WriteLine(" 5) Display Category and related products");
+                Console.WriteLine(" 6) Display all Categories and their related products");
+                Console.WriteLine(" 7) Display all Categories and their active products");
+                Console.WriteLine(" 8) Display a specific Category and its active products");
+                Console.WriteLine(" [Enter] to return to main menu");
+                Console.WriteLine("----------------------------------------");
+                Console.ForegroundColor = ConsoleColor.White;
+                string? choice = Console.ReadLine();
+                Console.Clear();
+                switch (choice)
+                {
+                    case "1":
+                        DisplayCategories(logger);
+                        break;
+                    case "2":
+                        AddCategory(logger);
+                        break;
+                    case "3":
+                        EditCategory(logger);
+                        break;
+                    case "4":
+                        DeleteCategory(logger);
+                        break;
+                    case "5":
+                        DisplayCategoryAndProducts(logger);
+                        break;
+                    case "6":
+                        DisplayAllCategoriesAndProducts(logger);
+                        break;
+                    case "7":
+                        DisplayAllCategoriesAndActiveProducts(logger);
+                        break;
+                    case "8":
+                        DisplayCategoryAndActiveProducts(logger);
+                        break;
+                    case null:
+                    case "":
+                        return;
+                    default:
+                        Console.WriteLine("Invalid option. Please try again.");
+                        break;
+                }
+            }
+        }
     }
 }
