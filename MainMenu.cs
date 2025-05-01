@@ -34,8 +34,14 @@ namespace NorthwindConsole
                 Console.WriteLine("  3) View Statistics Options");
                 Console.WriteLine();
 
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine("[Database Management]");
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine("  4) View Database Management Options");
+                Console.WriteLine();
+
                 Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine("  [Enter] to quit");
+                Console.WriteLine("[Enter] to quit");
                 Console.WriteLine("----------------------------------------");
                 Console.ForegroundColor = ConsoleColor.White;
                 string? choice = Console.ReadLine();
@@ -52,6 +58,9 @@ namespace NorthwindConsole
                         break;
                     case "3":
                         StatisticsActions.ShowStatisticsMenu(logger);
+                        break;
+                    case "4":
+                        DatabaseActions.ShowDatabaseMenu(logger);
                         break;
                     case null:
                     case "":
